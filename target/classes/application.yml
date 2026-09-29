@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: ws-poc
+
+  thymeleaf:
+    cache: false      # disable in dev; set to true in production
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.example.wspoc: DEBUG
+    org.springframework.web.socket: INFO
+    org.springframework.messaging: INFO
