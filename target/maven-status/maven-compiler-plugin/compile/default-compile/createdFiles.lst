@@ -1,8 +1,0 @@
-com/example/wspoc/controller/PageController.class
-com/example/wspoc/controller/ChatController.class
-com/example/wspoc/controller/WebSocketEventListener.class
-com/example/wspoc/config/CorsConfig.class
-com/example/wspoc/model/ChatMessage.class
-com/example/wspoc/config/WebSocketConfig.class
-com/example/wspoc/WsPocApplication.class
-com/example/wspoc/model/ChatMessage$MessageType.class

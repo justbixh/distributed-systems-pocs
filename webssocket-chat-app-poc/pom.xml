@@ -13,7 +13,7 @@
   </parent>
 
   <groupId>com.example</groupId>
-  <artifactId>ws-poc</artifactId>
+  <artifactId>websocket-poc</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>ws-poc</name>
   <description>WebSocket POC with Spring Boot 4 and STOMP</description>
