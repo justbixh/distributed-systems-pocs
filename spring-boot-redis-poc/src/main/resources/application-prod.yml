@@ -1,0 +1,26 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  data:
+    redis:
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+
+  cache:
+    redis:
+      time-to-live: 3600000  # 1 hour in prod
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+logging:
+  level:
+    com.example.redispoc: INFO
+    root: WARN

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spring Boot WebSocket demo</title>
+  <style>
+    body {
+      max-width: 42rem;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      font: 1rem/1.5 system-ui, sans-serif;
+    }
+    label { display: block; margin-top: 1rem; }
+    input, button { box-sizing: border-box; padding: 0.6rem; font: inherit; }
+    input { width: 100%; }
+    #messages { min-height: 12rem; padding-left: 1.5rem; }
+    #status { font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Spring Boot WebSocket</h1>
+  <p>Status: <span id="status">Connecting...</span></p>
+
+  <form id="message-form">
+    <label>
+      Name
+      <input id="name" value="Alice" maxlength="30" required />
+    </label>
+    <label>
+      Message
+      <input id="message" autocomplete="off" required />
+    </label>
+    <button id="send" type="submit" disabled>Send to everyone</button>
+  </form>
+
+  <h2>Messages received</h2>
+  <ul id="messages"></ul>
+
+  <script>
+    const status = document.querySelector('#status');
+    const form = document.querySelector('#message-form');
+    const nameInput = document.querySelector('#name');
+    const messageInput = document.querySelector('#message');
+    const sendButton = document.querySelector('#send');
+    const messages = document.querySelector('#messages');
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const socket = new WebSocket(`${protocol}//${location.host}/ws`);
+
+    socket.addEventListener('open', () => {
+      status.textContent = 'Connected';
+      sendButton.disabled = false;
+    });
+
+    socket.addEventListener('message', (event) => {
+      const item = document.createElement('li');
+      item.textContent = event.data;
+      messages.append(item);
+    });
+
+    socket.addEventListener('close', () => {
+      status.textContent = 'Disconnected';
+      sendButton.disabled = true;
+    });
+
+    socket.addEventListener('error', () => {
+      status.textContent = 'Connection error';
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (socket.readyState !== WebSocket.OPEN) {
+        return;
+      }
+
+      socket.send(`${nameInput.value.trim()}: ${messageInput.value.trim()}`);
+      messageInput.value = '';
+      messageInput.focus();
+    });
+  </script>
+</body>
+</html>

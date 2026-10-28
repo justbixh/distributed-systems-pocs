@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: websocket-simple-backend-poc
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.example.wspoc: INFO
