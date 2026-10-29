@@ -1,57 +1,36 @@
 package com.example.redispoc.config;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * Production-grade Redis configuration with:
- * - Lettuce connection pooling
- * - Auto-reconnect & socket keep-alive
- * - Custom Jackson JSON serialization with type info
- * - String and Object templates
+ * Redis configuration using Spring Data Redis 4.0 APIs.
+ * Redis is used exclusively as a cache and atomic counter store.
+ * MySQL (via JPA) is the system of record for all entities.
+ *
+ * Serialization:
+ *  - Keys   → plain String (StringRedisSerializer)
+ *  - Values → JSON via RedisSerializer.json() (GenericJacksonJsonRedisSerializer, Jackson 3.x)
  */
 @Configuration
 public class RedisConfig {
 
     /**
-     * Custom ObjectMapper for Redis serialization.
-     * Registers JavaTimeModule and enables polymorphic type info for safe deserialization.
-     */
-    @Bean(name = "redisObjectMapper")
-    public ObjectMapper redisObjectMapper() {
-        var ptv = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType(Object.class)
-                .build();
-
-        return new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL,
-                        JsonTypeInfo.As.PROPERTY);
-    }
-
-    /**
      * Primary RedisTemplate with String keys and JSON values.
-     * Use this for storing complex domain objects.
+     * Used for atomic counter operations (view counts, rate-limiting, etc.).
      */
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory,
-                                                        ObjectMapper redisObjectMapper) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         var template = new RedisTemplate<String, Object>();
         template.setConnectionFactory(connectionFactory);
 
         var stringSerializer = new StringRedisSerializer();
-        var jsonSerializer = new GenericJackson2JsonRedisSerializer(redisObjectMapper);
+        var jsonSerializer   = RedisSerializer.json();
 
         template.setKeySerializer(stringSerializer);
         template.setHashKeySerializer(stringSerializer);

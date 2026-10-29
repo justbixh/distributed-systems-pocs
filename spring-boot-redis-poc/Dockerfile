@@ -1,15 +1,15 @@
 # Build stage
-FROM eclipse-temurin:17-jdk-alpine AS builder
+FROM maven:3.9-eclipse-temurin-17 AS builder
 WORKDIR /build
 COPY pom.xml .
+RUN mvn dependency:go-offline -B
 COPY src ./src
-RUN apk add --no-cache maven
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -B
 
 # Runtime stage
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre
 WORKDIR /app
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN groupadd --system appgroup && useradd --system --gid appgroup appuser
 COPY --from=builder /build/target/*.jar app.jar
 RUN chown appuser:appgroup app.jar
 USER appuser

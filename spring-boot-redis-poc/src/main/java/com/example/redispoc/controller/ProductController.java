@@ -19,35 +19,29 @@ import java.util.Map;
 
 /**
  * REST controller for Product resource.
- * Demonstrates full CRUD with Redis caching.
+ * MySQL is the system of record; Redis provides transparent caching.
  */
 @RestController
 @RequestMapping("/v1/products")
 @RequiredArgsConstructor
-@Tag(name = "Products", description = "Product management API backed by Redis")
+@Tag(name = "Products", description = "Product management API (MySQL + Redis cache)")
 public class ProductController {
 
     private final ProductService productService;
 
     @Operation(summary = "Create a new product")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Product created"),
-        @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
-    })
+    @ApiResponses({@ApiResponse(responseCode = "201", description = "Product created"), @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)})
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
                 .body(productService.createProduct(product));
     }
 
     @Operation(summary = "Get product by ID")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Found the product"),
-        @ApiResponse(responseCode = "404", description = "Product not found", content = @Content)
-    })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Found the product"), @ApiResponse(responseCode = "404", description = "Product not found", content = @Content)})
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProduct(
-            @Parameter(description = "Product ID") @PathVariable String id) {
+    public ResponseEntity<Product> getProduct(@Parameter(description = "Product ID") @PathVariable Long id) {
         Product product = productService.getProductById(id);
         productService.incrementAndGetViewCount(id);
         return ResponseEntity.ok(product);
@@ -61,33 +55,27 @@ public class ProductController {
 
     @Operation(summary = "Search products by category")
     @GetMapping("/search")
-    public ResponseEntity<List<Product>> getByCategory(
-            @Parameter(description = "Category name") @RequestParam String category) {
+    public ResponseEntity<List<Product>> getByCategory(@Parameter(description = "Category name") @RequestParam String category) {
         return ResponseEntity.ok(productService.getProductsByCategory(category));
     }
 
     @Operation(summary = "Update a product")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product updated"),
-        @ApiResponse(responseCode = "404", description = "Product not found", content = @Content)
-    })
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Product updated"), @ApiResponse(responseCode = "404", description = "Product not found", content = @Content)})
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(
-            @PathVariable String id,
-            @Valid @RequestBody Product product) {
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
         return ResponseEntity.ok(productService.updateProduct(id, product));
     }
 
     @Operation(summary = "Delete a product")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Get product view count (Redis atomic counter demo)")
+    @Operation(summary = "Get product view count (Redis atomic counter)")
     @GetMapping("/{id}/views")
-    public ResponseEntity<Map<String, Object>> getViewCount(@PathVariable String id) {
+    public ResponseEntity<Map<String, Object>> getViewCount(@PathVariable Long id) {
         return ResponseEntity.ok(Map.of("productId", id, "views", productService.getViewCount(id)));
     }
 }
