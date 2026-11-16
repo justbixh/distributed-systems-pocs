@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: simple-kafka-schema-registry
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    consumer:
+      # a brand-new consumer group starts from the oldest message instead of only new ones
+      auto-offset-reset: earliest
+      # raw bytes: the Reader picks its own reader schema instead of getting the writer's
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+    properties:
+      schema.registry.url: http://localhost:8081
+
+server:
+  port: 8080

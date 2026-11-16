@@ -1,0 +1,6 @@
+{"type": "record", "name": "Order", "namespace": "com.example.schemaregistry",
+ "fields": [
+   {"name": "id", "type": "string"},
+   {"name": "item", "type": "string"},
+   {"name": "note", "type": "string", "default": ""}
+ ]}
