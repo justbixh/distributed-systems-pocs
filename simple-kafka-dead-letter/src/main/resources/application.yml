@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: simple-kafka-dead-letter
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      # a brand-new consumer group starts from the oldest message instead of only new ones
+      auto-offset-reset: earliest
+
+server:
+  port: 8080
