@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: simple-kafka-delivery-guarantees
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      # a brand-new consumer group starts from the oldest message instead of only new ones
+      auto-offset-reset: earliest
+    producer:
+      # the broker confirms only after every in-sync replica has the message
+      acks: all
+      properties:
+        # the broker drops a retried duplicate of a send (same producer id + sequence number)
+        enable.idempotence: true
+
+server:
+  port: 8080

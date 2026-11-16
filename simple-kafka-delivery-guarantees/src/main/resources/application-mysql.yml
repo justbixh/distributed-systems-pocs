@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/delivery
+    username: root
+    password: password
+  sql:
+    init:
+      # schema.sql only runs on embedded databases by default
+      mode: always
