@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: simple-kafka-comparisons
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      # a brand-new consumer group starts from the oldest message instead of only new ones
+      auto-offset-reset: earliest
+  # RabbitMQ (localhost:5672, guest/guest) and Redis (localhost:6379) use Spring Boot's defaults
+
+server:
+  port: 8080
